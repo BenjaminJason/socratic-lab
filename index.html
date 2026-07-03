@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Socratic Lab · 苏格拉底式学习</title>
+<style>
+:root{--bg:#0f1218;--bg2:#171b24;--bg3:#212734;--tx:#e8ecf3;--tx2:#9aa6b8;--tx3:#5f6b7e;--ac:#5b8def;--ac2:#7fa8f5;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.16);--ok:#22b07d;--warn:#e0a63a}
+html[data-theme="light"]{--bg:#f6f8fc;--bg2:#fff;--bg3:#eef2f8;--tx:#1a2233;--tx2:#586275;--tx3:#8c96a8;--bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.15)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;-webkit-font-smoothing:antialiased}
+#app{max-width:760px;margin:0 auto;padding:0 16px calc(60px + env(safe-area-inset-bottom))}
+a{color:var(--ac2);text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;position:sticky;top:0;background:var(--bg);z-index:10}
+.brand{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.brand .dot{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#5b8def,#22b07d);display:flex;align-items:center;justify-content:center;font-size:13px}
+.tb-actions{display:flex;gap:6px}
+.ib{background:none;border:.5px solid var(--bd2);color:var(--tx2);border-radius:8px;padding:6px 10px;font-size:13px}
+.hero{padding:14px 0 6px}
+.hero h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+.hero p{color:var(--tx2);font-size:14px;margin-top:6px}
+.keybar{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.keybar input{flex:1;min-width:180px;padding:9px 12px;border-radius:9px;border:.5px solid var(--bd2);background:var(--bg2);color:var(--tx);font-size:13px}
+.keybar button{padding:9px 16px;border-radius:9px;border:none;background:var(--ac);color:#fff;font-weight:600;font-size:13px}
+.warn{font-size:12px;color:var(--warn);background:var(--bg2);border:.5px solid var(--bd);border-radius:8px;padding:9px 12px;margin:8px 0}
+.card{background:var(--bg2);border:.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:12px}
+.topic{display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s}
+.topic:hover{border-color:var(--bd2)}
+.tico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.tinfo{flex:1;min-width:0}
+.tname{font-weight:600;font-size:16px}
+.tmeta{font-size:12px;color:var(--tx2);margin-top:2px}
+.ring{position:relative;width:46px;height:46px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.sec-h{font-size:13px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;font-weight:600}
+.rev{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:.5px solid var(--warn);border-left:3px solid var(--warn);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.crumb{font-size:13px;color:var(--tx2);padding:10px 0;cursor:pointer}
+.node{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:.5px solid var(--bd);border-radius:11px;margin-bottom:8px;cursor:pointer}
+.node.lock{opacity:.5;cursor:not-allowed}
+.node-n{width:26px;height:26px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.node-t{flex:1;font-size:14.5px;font-weight:500}
+.mbar{width:52px;height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;flex-shrink:0}
+.mbar i{display:block;height:100%;background:linear-gradient(90deg,#5b8def,#22b07d)}
+.md{font-size:14.5px;line-height:1.85;color:var(--tx)}
+.md b{color:var(--tx);font-weight:700}
+.md .blk{margin:8px 0}
+.chat{margin-top:8px}
+.msg{padding:11px 14px;border-radius:12px;margin-bottom:9px;font-size:14px;line-height:1.7;white-space:pre-wrap}
+.msg.ai{background:var(--bg3);border-bottom-left-radius:3px}
+.msg.me{background:var(--ac);color:#fff;margin-left:auto;max-width:88%;border-bottom-right-radius:3px}
+.msg.sys{background:rgba(224,166,58,.12);color:var(--warn);font-size:13px}
+.chatbar{display:flex;gap:8px;margin-top:6px}
+.chatbar textarea{flex:1;padding:10px 12px;border-radius:10px;border:.5px solid var(--bd2);background:var(--bg2);color:var(--tx);font-size:14px;resize:none;font-family:inherit;min-height:44px;max-height:120px}
+.chatbar button{padding:0 18px;border-radius:10px;border:none;background:var(--ac);color:#fff;font-weight:600;font-size:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{font-size:12.5px;padding:5px 11px;border-radius:16px;background:var(--bg3);color:var(--tx2);border:.5px solid var(--bd)}
+.mis{font-size:13.5px;color:var(--tx2);padding:4px 0 4px 4px}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:12px;background:var(--bg3);color:var(--tx2);margin-right:6px}
+.btn{padding:10px 18px;border-radius:10px;border:none;font-size:14px;font-weight:600}
+.btn.pri{background:var(--ac);color:#fff}
+.btn.gho{background:transparent;border:.5px solid var(--bd2);color:var(--tx)}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg2);border:.5px solid var(--bd);border-radius:12px;padding:14px;text-align:center}
+.stat b{font-size:22px;display:block}
+.stat span{font-size:12px;color:var(--tx2)}
+canvas{width:100%;display:block;border-radius:12px;background:var(--bg2);border:.5px solid var(--bd)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:.5px solid var(--bd);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:20}
+.tab{flex:1;text-align:center;font-size:11px;color:var(--tx2);padding:4px;background:none;border:none}
+.tab.on{color:var(--ac2)}
+.tab .i{font-size:19px;display:block}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="content.js"></script>
+<script type="module">
+import { h, render } from 'https://esm.sh/preact@10.23.1';
+import { useState, useEffect, useRef, useMemo } from 'https://esm.sh/preact@10.23.1/hooks';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(h);
+const MODEL='claude-sonnet-4-6';
+
+/* ---------- 存储（封装 localStorage，便于日后替换）---------- */
+const storage = {
+  get(k,d){ try{const v=localStorage.getItem('sl_'+k);return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{localStorage.setItem('sl_'+k,JSON.stringify(v));}catch(e){} }
+};
+
+/* ---------- i18n ---------- */
+const STR={
+  title:{zh:'苏格拉底实验室',en:'Socratic Lab'},
+  sub:{zh:'不给答案，只把你问懂。三个主题，从零到深。',en:'No answers, only questions — until you truly get it.'},
+  keyPh:{zh:'粘贴 Anthropic API Key 启用 AI 导师',en:'Paste Anthropic API key to enable the AI tutor'},
+  save:{zh:'启用',en:'Enable'},saved:{zh:'已保存（点这更换）',en:'Saved (tap to change)'},
+  noKey:{zh:'未填 Key，AI 导师不可用。概念卡与进度仍可正常浏览。',en:'No key set — the AI tutor is off. You can still read cards and track progress.'},
+  topics:{zh:'三个主题',en:'Topics'},
+  review:{zh:'该复习了',en:'Time to review'},
+  overall:{zh:'总掌握度',en:'Overall mastery'},
+  nodes:{zh:'节点',en:'nodes'},
+  locked:{zh:'需先掌握前置节点',en:'Master prerequisites first'},
+  concept:{zh:'核心概念',en:'Core concept'},
+  ask:{zh:'向导师请教（它只会反问、给提示）',en:'Ask the tutor (it only asks & hints)'},
+  send:{zh:'发送',en:'Send'},
+  misc:{zh:'常见误区',en:'Common misconceptions'},
+  mastery:{zh:'掌握度',en:'Mastery'},
+  startS:{zh:'开始苏格拉底对话',en:'Start Socratic dialogue'},
+  feynman:{zh:'费曼检验',en:'Feynman test'},
+  feynDesc:{zh:'用你自己的话，向一个聪明的高中生解释本主题。AI 会扮演他，提出天真却刁钻的问题。',en:'Explain this topic to a smart high-schooler in your own words. The AI plays that student with naive-but-sharp questions.'},
+  feynStart:{zh:'我准备好了，开始讲',en:'I\'m ready, let me explain'},
+  graph:{zh:'知识图谱',en:'Knowledge graph'},
+  stats:{zh:'统计',en:'Stats'},home:{zh:'主页',en:'Home'},
+  totalTime:{zh:'总学习时长',en:'Total time'},streak:{zh:'连续天数',en:'Day streak'},done:{zh:'已掌握节点',en:'Mastered'},
+  min:{zh:'分钟',en:'min'},days:{zh:'天',en:'days'},
+  tutorThinking:{zh:'导师思考中',en:'Tutor thinking'},
+  graphHint:{zh:'节点越绿＝掌握越好；连线＝依赖关系。点节点进入。',en:'Greener = better mastery; lines = dependencies. Tap a node.'},
+  trans:{zh:'🌐 English',en:'🌐 中文'},transing:{zh:'翻译中',en:'Translating'},orig:{zh:'↩ 原文',en:'↩ Original'},
+  exportP:{zh:'导出进度',en:'Export progress'},resetP:{zh:'重置进度',en:'Reset progress'},
+  resetC:{zh:'确定清空所有学习进度？此操作不可撤销。',en:'Clear ALL learning progress? This cannot be undone.'}
+};
+
+/* ---------- 系统提示词 ---------- */
+function tutorSystem(node, mastery, lang){
+  return `你是一位严格的苏格拉底式导师。当前学习节点：「${node.title}」。
+本节点核心概念（供你参考，但绝不能直接照抄给学生）：
+${node.card}
+常见误区：${node.misconceptions.join('；')}
+学生当前对本节点的掌握度约为 ${mastery}/100。
+
+铁律：
+1. 【绝不直接给答案或结论】。你只能提问、给渐进提示、引导学生自己想出来。
+2. 学生连续卡住（答不上/明显错）达 3 次，才可以逐层揭示一点点，但仍以引导为主。
+3. 学生答对时，必须追问「为什么」或换个角度确认，防止他是蒙的或死记。
+4. 根据学生回答质量动态调节难度：答得好就加深，答得吃力就退回更基础的一步。
+5. 一次只问一个核心问题，简洁（不超过120字），用${lang==='en'?'英文':'中文'}。
+6. 每次回复的最后一行，单独输出对学生当前掌握度的评估，格式严格为：[[mastery:NN]]（NN 为 0-100 整数），这行不要有别的字。前面的对话正文里不要提到这个分数。`;
+}
+function feynmanSystem(topic, lang){
+  return `你现在扮演「一个聪明但天真的高中生」。用户（学习者）要用自己的话向你解释「${topic.name}」这个主题。
+你的任务：
+1. 用${lang==='en'?'英文':'中文'}、以高中生的口吻，对用户的解释提出天真但刁钻的追问（比如"为什么一定是这样？""那这个和那个不矛盾吗？""你能举个例子吗？"）。
+2. 不要卖弄专业术语，就像一个真的想搞懂的聪明高中生。
+3. 追问 3-4 轮后，给出评价：用户的解释哪里清楚、哪里有漏洞或含糊，最后给一个 0-100 的"讲清楚了吗"评分。评分那行用格式 [[feynman:NN]]。`;
+}
+
+/* ---------- 工具 ---------- */
+function mdToHtml(t){
+  return t.split('\n').map(line=>{
+    if(!line.trim())return html`<div style="height:6px"></div>`;
+    const parts=line.split(/(\*\*[^*]+\*\*)/g).map(p=>p.startsWith('**')?html`<b>${p.slice(2,-2)}</b>`:p);
+    return html`<div class="blk">${parts}</div>`;
+  });
+}
+const todayStr=()=>new Date().toISOString().slice(0,10);
+// 间隔复习：掌握度随时间衰减，返回"有效掌握度"
+function effMastery(rec){
+  if(!rec||!rec.mastery)return 0;
+  const days=(Date.now()-(rec.ts||Date.now()))/864e5;
+  const decay=Math.exp(-days/30); // 30天特征衰减
+  return Math.round(rec.mastery*(0.4+0.6*decay)); // 至少保留40%
+}
+
+/* ---------- Anthropic 调用 ---------- */
+async function askClaude(key, system, messages){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','content-type':'application/json'},
+    body:JSON.stringify({model:MODEL,max_tokens:600,system,messages})
+  });
+  const j=await r.json();
+  if(j.error)throw new Error(j.error.message||'API 错误');
+  return j.content.map(b=>b.text||'').join('');
+}
+
+/* ================= 组件 ================= */
+function Ring({v,color}){
+  const R=18,C=2*Math.PI*R,off=C*(1-v/100);
+  return html`<div class="ring"><svg width="46" height="46">
+    <circle cx="23" cy="23" r="${R}" fill="none" stroke="var(--bg3)" stroke-width="4"/>
+    <circle cx="23" cy="23" r="${R}" fill="none" stroke="${color||'var(--ac)'}" stroke-width="4" stroke-dasharray="${C}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+  </svg><span>${v}</span></div>`;
+}
+
+function App(){
+  const [lang,setLang]=useState(storage.get('lang','zh'));
+  const [theme,setTheme]=useState(storage.get('theme','dark'));
+  const [key,setKey]=useState(storage.get('key',''));
+  const [prog,setProg]=useState(storage.get('prog',{}));
+  const [stats,setStats]=useState(storage.get('stats',{ms:0,days:[]}));
+  const [view,setView]=useState({name:'home'});
+  const T=k=>STR[k][lang];
+
+  useEffect(()=>{document.documentElement.setAttribute('data-theme',theme);storage.set('theme',theme);},[theme]);
+  useEffect(()=>storage.set('lang',lang),[lang]);
+  useEffect(()=>storage.set('prog',prog),[prog]);
+  // 记录活跃天 + 时长
+  useEffect(()=>{
+    const d=todayStr();const days=stats.days.includes(d)?stats.days:[...stats.days,d];
+    const s={...stats,days};setStats(s);storage.set('stats',s);
+    const iv=setInterval(()=>{setStats(p=>{const n={...p,ms:(p.ms||0)+15000};storage.set('stats',n);return n;});},15000);
+    return()=>clearInterval(iv);
+  },[]);
+
+  const setMastery=(nodeId,m)=>setProg(p=>({...p,[nodeId]:{mastery:Math.max(p[nodeId]?.mastery||0,m),ts:Date.now()}}));
+  const findNode=id=>{for(const t of TOPICS){const n=t.nodes.find(x=>x.id===id);if(n)return{topic:t,node:n};}};
+
+  // 复习提醒：曾掌握>=60，但有效掌握<50
+  const reviews=[];
+  for(const t of TOPICS)for(const n of t.nodes){const rec=prog[n.id];if(rec&&rec.mastery>=60&&effMastery(rec)<50)reviews.push({t,n,eff:effMastery(rec)});}
+
+  const saveKey=v=>{if(v&&v!=='__'){setKey(v);storage.set('key',v);}};
+
+  return html`
+  <div class="topbar">
+    <div class="brand"><span class="dot">🧠</span>${T('title')}</div>
+    <div class="tb-actions">
+      <button class="ib" onClick=${()=>setLang(lang==='zh'?'en':'zh')}>${lang==='zh'?'EN':'中'}</button>
+      <button class="ib" onClick=${()=>setTheme(theme==='dark'?'light':'dark')}>${theme==='dark'?'☀️':'🌙'}</button>
+    </div>
+  </div>
+
+  ${view.name==='home'&&html`<${Home} ...${{T,prog,reviews,setView,key,saveKey,findNode,lang}}/>`}
+  ${view.name==='topic'&&html`<${TopicView} ...${{T,topic:view.topic,prog,setView,lang}}/>`}
+  ${view.name==='node'&&html`<${NodeView} ...${{T,topic:view.topic,node:view.node,prog,setMastery,setView,key,lang}}/>`}
+  ${view.name==='graph'&&html`<${GraphView} ...${{T,topic:view.topic,prog,setView,lang}}/>`}
+  ${view.name==='feynman'&&html`<${Feynman} ...${{T,topic:view.topic,setView,key,setProg,lang}}/>`}
+  ${view.name==='stats'&&html`<${Stats} ...${{T,prog,stats,lang}}/>`}
+
+  <div class="tabbar">
+    <button class="tab ${view.name==='home'?'on':''}" onClick=${()=>setView({name:'home'})}><span class="i">🏠</span>${T('home')}</button>
+    <button class="tab ${view.name==='stats'?'on':''}" onClick=${()=>setView({name:'stats'})}><span class="i">📊</span>${T('stats')}</button>
+  </div>`;
+}
+
+function Home({T,prog,reviews,setView,key,saveKey,findNode,lang}){
+  const [kv,setKv]=useState(key?'__':'');
+  const topicMastery=t=>{const arr=t.nodes.map(n=>prog[n.id]?.mastery||0);return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);};
+  return html`
+  <div class="hero"><h1>${T('title')}</h1><p>${T('sub')}</p></div>
+  <div class="keybar">
+    <input value=${kv} placeholder=${T('keyPh')} onInput=${e=>setKv(e.target.value)} onFocus=${e=>{if(e.target.value==='__')setKv('');}}/>
+    <button onClick=${()=>{saveKey(kv.trim());setKv('__');}}>${key?T('saved'):T('save')}</button>
+  </div>
+  ${!key&&html`<div class="warn">${T('noKey')}</div>`}
+  ${reviews.length>0&&html`<div class="sec-h">🔔 ${T('review')}</div>
+    ${reviews.slice(0,4).map(r=>html`<div class="rev" onClick=${()=>setView({name:'node',topic:r.t,node:r.n})}>
+      <span style="font-size:18px">${r.t.icon}</span><div style="flex:1"><div style="font-size:14px;font-weight:500">${r.n.title}</div><div style="font-size:12px;color:var(--tx2)">${r.t.name} · ${T('mastery')} ${r.eff}（已衰减）</div></div><span style="color:var(--warn)">→</span></div>`)}`}
+  <div class="sec-h">${T('topics')}</div>
+  ${TOPICS.map(t=>{const m=topicMastery(t);return html`<div class="card topic" onClick=${()=>setView({name:'topic',topic:t})}>
+    <div class="tico" style="background:${t.color}22">${t.icon}</div>
+    <div class="tinfo"><div class="tname">${t.name}</div><div class="tmeta">${t.nodes.length} ${T('nodes')} · ${T('overall')} ${m}%</div></div>
+    <${Ring} v=${m} color=${t.color}/></div>`;})}`;
+}
+
+function TopicView({T,topic,prog,setView,lang}){
+  const done=topic.nodes.every(n=>(prog[n.id]?.mastery||0)>=60);
+  const unlocked=n=>n.deps.every(d=>(prog[d]?.mastery||0)>=50);
+  return html`
+  <div class="crumb" onClick=${()=>setView({name:'home'})}>← ${T('home')}</div>
+  <div class="hero" style="padding-top:4px"><h1>${topic.icon} ${topic.name}</h1></div>
+  ${topic.hook&&html`<div class="card" style="border-color:${topic.color}55;background:${topic.color}12;font-size:14px">💡 ${topic.hook}</div>`}
+  <div class="chips">
+    <button class="chip" style="cursor:pointer" onClick=${()=>setView({name:'graph',topic})}>🕸️ ${T('graph')}</button>
+    ${done&&html`<button class="chip" style="cursor:pointer;background:var(--ok);color:#fff" onClick=${()=>setView({name:'feynman',topic})}>🎓 ${T('feynman')}</button>`}
+  </div>
+  ${topic.nodes.map((n,i)=>{const m=prog[n.id]?.mastery||0;const lock=!unlocked(n);
+    return html`<div class="node ${lock?'lock':''}" onClick=${()=>!lock&&setView({name:'node',topic,node:n})}>
+      <div class="node-n">${i+1}</div><div class="node-t">${n.title}${lock?html`<div style="font-size:11px;color:var(--tx3);font-weight:400">🔒 ${T('locked')}</div>`:''}</div>
+      <div class="mbar"><i style="width:${m}%"></i></div></div>`;})}`;
+}
+
+function NodeView({T,topic,node,prog,setMastery,setView,key,lang}){
+  const [msgs,setMsgs]=useState([]);
+  const [input,setInput]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [trans,setTrans]=useState(null);
+  const [tbusy,setTbusy]=useState(false);
+  const mastery=prog[node.id]?.mastery||0;
+  async function translate(){
+    if(trans){setTrans(null);return;}
+    if(!key){setMsgs(m=>[...m,{r:'sys',t:T('noKey')}]);return;}
+    setTbusy(true);
+    try{const out=await askClaude(key,'You are a precise translator. Translate the following Chinese study material into clear English. Keep the **bold** markers and line breaks. Output ONLY the translation, nothing else.',[{role:'user',content:node.card}]);setTrans(out);}catch(e){setMsgs(m=>[...m,{r:'sys',t:'翻译失败：'+e.message}]);}
+    setTbusy(false);
+  }
+  const scroller=useRef();
+  useEffect(()=>{scroller.current&&scroller.current.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
+
+  async function turn(userText){
+    if(!key){setMsgs(m=>[...m,{r:'sys',t:T('noKey')}]);return;}
+    const history=[...msgs.filter(m=>m.r!=='sys').map(m=>({role:m.r==='me'?'user':'assistant',content:m.t}))];
+    if(userText)history.push({role:'user',content:userText});
+    setBusy(true);
+    try{
+      let out=await askClaude(key,tutorSystem(node,mastery,lang),history.length?history:[{role:'user',content:lang==='en'?'Start.':'开始吧。'}]);
+      const mm=out.match(/\[\[mastery:(\d+)\]\]/);
+      if(mm){setMastery(node.id,Math.min(100,+mm[1]));out=out.replace(/\[\[mastery:\d+\]\]/,'').trim();}
+      setMsgs(m=>[...m,{r:'ai',t:out}]);
+    }catch(e){setMsgs(m=>[...m,{r:'sys',t:'出错：'+e.message}]);}
+    setBusy(false);
+  }
+  function send(){const t=input.trim();if(!t||busy)return;setInput('');setMsgs(m=>[...m,{r:'me',t}]);turn(t);}
+
+  return html`
+  <div class="crumb" onClick=${()=>setView({name:'topic',topic})}>← ${topic.name}</div>
+  <div class="hero" style="padding-top:2px"><h1 style="font-size:20px">${node.title}</h1>
+    <div style="margin-top:6px"><span class="pill">${T('mastery')} ${mastery}</span>${node.deps.length?html`<span class="pill">依赖 ${node.deps.length}</span>`:''}</div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px"><div class="sec-h" style="margin:0">${T('concept')}</div>
+    <button class="chip" style="cursor:pointer" onClick=${translate} disabled=${tbusy}>${tbusy?html`<span class="spin"></span> ${T('transing')}`:(trans?T('orig'):'🌐 English')}</button></div>
+    <div class="md">${mdToHtml(trans||node.card)}</div></div>
+  <div class="card"><div class="sec-h" style="margin:0 0 6px">⚠️ ${T('misc')}</div>${node.misconceptions.map(m=>html`<div class="mis">· ${m}</div>`)}</div>
+
+  <div class="sec-h">🧑‍🏫 ${T('ask')}</div>
+  ${msgs.length===0&&html`<div class="chips">${node.questions.slice(0,3).map(q=>html`<button class="chip" style="cursor:pointer" onClick=${()=>{setMsgs([{r:'ai',t:q}]);}}>${q.length>18?q.slice(0,18)+'…':q}</button>`)}</div>
+    <button class="btn pri" style="margin:4px 0 10px" onClick=${()=>{setMsgs([]);turn(null);}}>${busy?html`<span class="spin"></span>`:'▶ '+T('startS')}</button>`}
+  <div class="chat">
+    ${msgs.map(m=>html`<div class="msg ${m.r}">${m.t}</div>`)}
+    ${busy&&html`<div class="msg ai"><span class="spin"></span> ${T('tutorThinking')}…</div>`}
+    <div ref=${scroller}></div>
+  </div>
+  ${msgs.length>0&&html`<div class="chatbar">
+    <textarea value=${input} placeholder=${T('send')+'…'} onInput=${e=>setInput(e.target.value)} onKeyDown=${e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}></textarea>
+    <button onClick=${send} disabled=${busy}>${T('send')}</button></div>`}`;
+}
+
+function Feynman({T,topic,setView,key,setProg,lang}){
+  const [msgs,setMsgs]=useState([]);const [input,setInput]=useState('');const [busy,setBusy]=useState(false);const [started,setStarted]=useState(false);
+  const scroller=useRef();useEffect(()=>{scroller.current&&scroller.current.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
+  async function turn(userText){
+    if(!key){setMsgs(m=>[...m,{r:'sys',t:T('noKey')}]);return;}
+    const history=[...msgs.filter(m=>m.r!=='sys').map(m=>({role:m.r==='me'?'user':'assistant',content:m.t}))];
+    if(userText)history.push({role:'user',content:userText});
+    setBusy(true);
+    try{let out=await askClaude(key,feynmanSystem(topic,lang),history);
+      const fm=out.match(/\[\[feynman:(\d+)\]\]/);
+      let score=null;if(fm){score=+fm[1];out=out.replace(/\[\[feynman:\d+\]\]/,'').trim();}
+      setMsgs(m=>{const arr=[...m,{r:'ai',t:out}];if(score!=null)arr.push({r:'sys',t:`🎓 ${lang==='en'?'Feynman score':'费曼讲清度评分'}：${score}/100`});return arr;});
+      if(score!=null){const s=storage.get('feyn',{});s[topic.id]=Math.max(s[topic.id]||0,score);storage.set('feyn',s);}
+    }catch(e){setMsgs(m=>[...m,{r:'sys',t:'出错：'+e.message}]);}
+    setBusy(false);
+  }
+  function send(){const t=input.trim();if(!t||busy)return;setInput('');setMsgs(m=>[...m,{r:'me',t}]);turn(t);}
+  return html`
+  <div class="crumb" onClick=${()=>setView({name:'topic',topic})}>← ${topic.name}</div>
+  <div class="hero" style="padding-top:2px"><h1 style="font-size:20px">🎓 ${T('feynman')} · ${topic.name}</h1></div>
+  <div class="card" style="font-size:14px;color:var(--tx2)">${T('feynDesc')}</div>
+  ${!started?html`<button class="btn pri" onClick=${()=>setStarted(true)}>${T('feynStart')}</button>`:html`
+    <div class="chat">${msgs.map(m=>html`<div class="msg ${m.r}">${m.t}</div>`)}${busy&&html`<div class="msg ai"><span class="spin"></span></div>`}<div ref=${scroller}></div></div>
+    <div class="chatbar"><textarea value=${input} placeholder="用你自己的话解释…" onInput=${e=>setInput(e.target.value)} onKeyDown=${e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}></textarea><button onClick=${send} disabled=${busy}>${T('send')}</button></div>`}`;
+}
+
+function GraphView({T,topic,prog,setView,lang}){
+  const cv=useRef();
+  useEffect(()=>{
+    const canvas=cv.current;if(!canvas)return;const dpr=window.devicePixelRatio||1;
+    const W=canvas.clientWidth,H=360;canvas.width=W*dpr;canvas.height=H*dpr;const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+    const nodes=topic.nodes.map((n,i)=>({id:n.id,t:n.title,x:W/2+Math.cos(i)*80+(Math.random()-.5)*40,y:H/2+Math.sin(i)*80+(Math.random()-.5)*40,vx:0,vy:0,m:prog[n.id]?.mastery||0}));
+    const idx={};nodes.forEach((n,i)=>idx[n.id]=i);
+    const edges=[];topic.nodes.forEach(n=>n.deps.forEach(d=>{if(idx[d]!=null)edges.push([idx[d],idx[n.id]]);}));
+    let iter=0,raf;
+    function step(){
+      iter++;
+      for(let i=0;i<nodes.length;i++){for(let j=i+1;j<nodes.length;j++){const a=nodes[i],b=nodes[j];let dx=a.x-b.x,dy=a.y-b.y;let d=Math.hypot(dx,dy)||1;const f=1400/(d*d);a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f;}}
+      edges.forEach(([i,j])=>{const a=nodes[i],b=nodes[j];let dx=b.x-a.x,dy=b.y-a.y;let d=Math.hypot(dx,dy)||1;const f=(d-90)*0.02;a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f;});
+      nodes.forEach(n=>{n.vx+=(W/2-n.x)*0.002;n.vy+=(H/2-n.y)*0.002;n.x+=n.vx*=.85;n.y+=n.vy*=.85;n.x=Math.max(24,Math.min(W-24,n.x));n.y=Math.max(24,Math.min(H-24,n.y));});
+      ctx.clearRect(0,0,W,H);
+      ctx.strokeStyle='rgba(150,160,180,.3)';ctx.lineWidth=1.2;edges.forEach(([i,j])=>{ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();});
+      nodes.forEach(n=>{const g=n.m/100;const col=`rgb(${Math.round(91-g*40)},${Math.round(141+g*30)},${Math.round(239-g*100)})`;ctx.beginPath();ctx.arc(n.x,n.y,13,0,7);ctx.fillStyle=n.m>0?col:'#39414f';ctx.fill();ctx.fillStyle='#fff';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText(n.m,n.x,n.y+4);});
+      if(iter<220)raf=requestAnimationFrame(step);
+    }
+    step();
+    canvas.onclick=e=>{const r=canvas.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;const hit=nodes.find(n=>Math.hypot(n.x-mx,n.y-my)<16);if(hit){const node=topic.nodes.find(x=>x.id===hit.id);setView({name:'node',topic,node});}};
+    return()=>cancelAnimationFrame(raf);
+  },[topic]);
+  return html`<div class="crumb" onClick=${()=>setView({name:'topic',topic})}>← ${topic.name}</div>
+  <div class="hero" style="padding-top:2px"><h1 style="font-size:20px">🕸️ ${T('graph')} · ${topic.name}</h1><p>${T('graphHint')}</p></div>
+  <canvas ref=${cv} style="height:360px"></canvas>`;
+}
+
+function Stats({T,prog,stats,lang}){
+  function expo(){const data={prog,stats,feyn:storage.get('feyn',{}),exportedAt:new Date().toISOString()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='socratic-progress.json';a.click();}
+  function reset(){if(confirm(T('resetC'))){['prog','stats','feyn'].forEach(k=>localStorage.removeItem('sl_'+k));location.reload();}}
+  const allNodes=TOPICS.flatMap(t=>t.nodes);
+  const mastered=allNodes.filter(n=>(prog[n.id]?.mastery||0)>=60).length;
+  const min=Math.round((stats.ms||0)/60000);
+  // 连续天数
+  let streak=0;let d=new Date();for(;;){const s=d.toISOString().slice(0,10);if(stats.days.includes(s)){streak++;d.setDate(d.getDate()-1);}else break;}
+  return html`<div class="hero"><h1>📊 ${T('stats')}</h1></div>
+  <div class="statgrid">
+    <div class="stat"><b>${min}</b><span>${T('totalTime')} (${T('min')})</span></div>
+    <div class="stat"><b>${streak}</b><span>${T('streak')}</span></div>
+    <div class="stat"><b>${mastered}/${allNodes.length}</b><span>${T('done')}</span></div>
+  </div>
+  <div class="sec-h">${T('overall')}</div>
+  ${TOPICS.map(t=>{const arr=t.nodes.map(n=>prog[n.id]?.mastery||0);const m=Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+    return html`<div class="card topic"><div class="tico" style="background:${t.color}22">${t.icon}</div><div class="tinfo"><div class="tname">${t.name}</div><div class="tmeta">${T('overall')} ${m}%</div></div><${Ring} v=${m} color=${t.color}/></div>`;})}
+  <div style="display:flex;gap:8px;margin-top:20px">
+    <button class="btn gho" onClick=${expo}>⬇ ${T('exportP')}</button>
+    <button class="btn gho" style="color:var(--warn)" onClick=${reset}>🗑 ${T('resetP')}</button>
+  </div>`;
+}
+
+render(html`<${App}/>`, document.getElementById('app'));
+</script>
+</body>
+</html>
